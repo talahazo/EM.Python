@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+
+\title{\textbf{Análisis Profundo y Estadístico de la Base de Datos de Aleaciones de Elementos Múltiples (MPEAs)}}
+\author{Facultad de Ingeniería -- UNAM}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este documento presenta un análisis exploratorio y metalúrgico detallado de una base de datos compuesta por $1,545$ registros de Aleaciones de Elementos Múltiples (MPEAs / HEAs). Se evalúan las relaciones composicionales, microestructurales y mecánicas, el impacto de la temperatura de ensayo, y los desafíos asociados al tratamiento de datos faltantes para futuras implementaciones de Aprendizaje Automático (Machine Learning).
+\end{abstract}
+
+\section{Mapeo de Composición y Elementos Constituyentes}
+Al examinar las fórmulas químicas de la base de datos, se observa un claro dominio de metales de transición del bloque $d$ y elementos refractarios, reflejando las dos familias principales de estudio en la literatura de materiales avanzados:
+\begin{itemize}
+    \item \textbf{Elementos más frecuentes:} Cromo (\ce{Cr}: $871$ apariciones), Níquel (\ce{Ni}: $845$), Hierro (\ce{Fe}: $829$), Cobalto (\ce{Co}: $734$), Titanio (\ce{Ti}: $708$), Aluminio (\ce{Al}: $672$) y Niobio (\ce{Nb}: $617$).
+    \item \textbf{Sistemas Clave:} Predominan las aleaciones base de transición (sistema Co-Cr-Fe-Ni-Mn con adiciones de Al) y los sistemas refractarios de alta entropía (ej. Hf-Nb-Ta-Ti-Zr).
+\end{itemize}
+
+\section{Evolución Bibliográfica y Temporal}
+La distribución temporal de las referencias abarca desde el año $2004$ hasta $2019$:
+\begin{itemize}
+    \item Se registra un crecimiento exponencial en la investigación del área, con un incremento masivo de registros concentrados en los años $2017$, $2018$ y $2019$ (este último concentra $685$ registros).
+    \item Esto evidencia que la base de datos recopila el periodo de madurez y caracterización sistemática de propiedades mecánicas a diversas temperaturas.
+\end{itemize}
+
+\section{Complejidad Microestructural y Clasificación de Fases}
+La columna de fases cristalinas clasifica los registros en estructuras Cúbicas Centradas en el Cuerpo (\textbf{BCC}), en las Caras (\textbf{FCC}) y sistemas complejos (\textbf{other}, con $812$ registros):
+\begin{itemize}
+    \item \textbf{Diversidad de Fases:} El grupo \texttt{other} agrupa microestructuras multifásicas (mezclas de $\text{BCC}+\text{Laves}$, $\text{FCC}+\text{BCC}$, precipitados secundarios y fases ordenadas tipo \ce{B2} o \ce{L12}).
+    \item \textbf{Procesamiento:} Los métodos de fundición (\texttt{CAST}, $647$ registros) tienden a generar estructuras dendríticas con segregación. En contraste, la polvometalurgia (\texttt{POWDER}) y el recocido (\texttt{ANNEAL}) buscan refinar el grano, aunque exigen un control térmico riguroso.
+\end{itemize}
+
+\section{Efecto de la Temperatura de Ensayo}
+Las temperaturas de prueba varían desde condiciones criogénicas extremas ($-268.8\,^\circ\text{C}$) hasta temperaturas elevadas ($1600\,^\circ\text{C}$):
+\begin{equation}
+    \text{Correlación}(T, \text{YS}) \approx -0.42
+\end{equation}
+El límite elástico (\text{YS}) y la resistencia a la tracción (\text{UTS}) disminuyen de manera pronunciada conforme aumenta la temperatura de ensayo, un comportamiento característico de los mecanismos de activación térmica y el movimiento de dislocaciones.
+
+\section{El Reto de los Datos Faltantes (\textit{Missing Data})}
+Un hallazgo crítico del análisis interno es la alta disparidad en la disponibilidad de variables:
+\begin{itemize}
+    \item \textbf{Alta Disponibilidad:} Densidades calculadas termodinámicamente y clasificaciones cristalográficas básicas ($100\%$), junto con el límite elástico ($\approx 69\%$).
+    \item \textbf{Baja Disponibilidad Experimental:} Propiedades como el tamaño de grano ($237$ registros), densidad experimental ($112$ registros) y concentraciones de impurezas intersticiales (Oxígeno, Nitrógeno y Carbono presentes en $<4\%$).
+    \item \textbf{Implicación para ML:} Los modelos predictivos deben emplear estrategias robustas de imputación o enfocarse en subconjuntos basados en estequiometría y termodinámica.
+\end{itemize}
+
+\section{Preguntas de Interés Estratégico para Gráficas y Machine Learning}
+Para profundizar en el diseño de materiales, se plantean las siguientes líneas de investigación computacional:
+
+\begin{enumerate}
+    \item \textbf{Predicción Estequiométrica de Propiedades Mecánicas:} 
+    \begin{quote}
+    \textit{¿Es posible entrenar un modelo de Machine Learning (ej. Random Forest o Gradient Boosting) para predecir el Límite Elástico ($\text{YS}$) y la Resistencia Máxima ($\text{UTS}$) en función de las fracciones atómicas y el método de procesamiento?}
+    \end{quote}
+    
+    \item \textbf{Clasificación Termodinámica de Fases Cristalinas:}
+    \begin{quote}
+    \textit{¿Qué parámetros termodinámicos ($\Delta H_{mix}$, $\Delta S_{mix}$, diferencia de radio atómico $\delta$) determinan con mayor precisión la formación de fases monofásicas frente a multifásicas?}
+    \end{quote}
+    
+    \item \textbf{Optimización Multi-Objetivo y Frontera de Pareto:}
+    \begin{quote}
+    \textit{Mediante técnicas de \textit{clustering} y optimización, ¿qué composiciones rompen el compromiso tradicional entre resistencia y ductilidad para definir una Frontera de Pareto óptima?}
+    \end{quote}
+\end{enumerate}
+
+\end{document}
