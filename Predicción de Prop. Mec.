@@ -1,0 +1,88 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{gray}\itshape,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    backgroundcolor=\color{white}
+}
+
+\title{\textbf{Predicción Estequiométrica y Procesal de Propiedades Mecánicas en MPEAs}}
+\author{Facultad de Ingeniería -- UNAM}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este documento detalla la formulación teórica, la ingeniería de características, la selección de modelos de aprendizaje automático, la validación y el código base de implementación en Python para resolver la predicción del límite elástico y la resistencia a la tracción en Aleaciones de Elementos Múltiples (MPEAs).
+\end{abstract}
+
+\section{Definición del Problema y Justificación Metalúrgica}
+En las aleaciones de alta entropía y sistemas multicomponentes, la resistencia mecánica (\textit{límite elástico} $YS$ y \textit{resistencia última a la tracción} $UTS$) está gobernada por la combinación de múltiples factores físicos y termodinámicos:
+\begin{itemize}
+    \item \textbf{Endurecimiento por solución sólida:} Derivado de la diferencia de radios atómicos ($\delta$) y los módulos de corte entre los elementos constituyentes.
+    \item \textbf{Efectos estequiométricos:} Las proporciones atómicas exactas de elementos formadores de fases duras (ej. Al, Ti, Nb) frente a elementos base dúctiles (ej. Co, Ni, Fe).
+    \item \textbf{Parámetros externos y de fabricación:} Temperatura de ensayo ($T$) y método de procesamiento (\texttt{CAST}, \texttt{ANNEAL}, \texttt{POWDER}, \texttt{WROUGHT}).
+\end{itemize}
+
+\section{Ingeniería de Características (\textit{Feature Engineering})}
+Para transformar la base de datos en una matriz de características ($X$) apta para algoritmos de regresión, se requiere el siguiente pipeline:
+
+\subsection{Vectorización de la Composición Química}
+A partir de la fórmula química, se extraen los elementos individuales y se calculan sus fracciones atómicas normalizadas $x_i$:
+\begin{equation}
+    \sum_{i=1}^{n} x_i = 1
+\end{equation}
+Donde $n$ es el número total de elementos únicos detectados ($n = 30$). Cada fórmula se convierte en un vector disperso de $30$ dimensiones.
+
+\subsection{Descriptores Termodinámicos y Físicos}
+\begin{enumerate}
+    \item \textbf{Diferencia de radio atómico ($\delta$):}
+    \begin{equation}
+        \delta = \sqrt{\sum_{i=1}^{n} x_i \left(1 - \frac{r_i}{\bar{r}}\right)^2}
+    \end{equation}
+    \item \textbf{Entropía de mezcla ideal ($\Delta S_{mix}$):}
+    \begin{equation}
+        \Delta S_{mix} = -R \sum_{i=1}^{n} x_i \ln x_i
+    \end{equation}
+    \item \textbf{Variables adicionales:} Densidad calculada y temperatura de ensayo ($T$).
+\end{enumerate}
+
+\section{Selección de Modelos de Machine Learning}
+Se evalúan tres familias de modelos de regresión supervisada:
+\begin{enumerate}
+    \item \textbf{Random Forest Regressor:} Robusto ante interacciones no lineales complejas mediante \textit{bagging}.
+    \item \textbf{Gradient Boosting / XGBoost:} Altamente eficiente para capturar efectos sinérgicos sutiles entre elementos minoritarios.
+    \item \textbf{Redes Neuronales Multicapa (MLP):} Útiles para aprender representaciones latentes profundas.
+\end{enumerate}
+
+\section{Validación y Métricas de Rendimiento}
+Para garantizar la generalización del modelo se emplea:
+\begin{itemize}
+    \item \textbf{Validación Cruzada:} Estrategia de $k$-folds ($k = 5$ o $10$).
+    \item \textbf{Métricas de Evaluación:} Coeficiente de Determinación ($R^2$), Raíz del Error Cuadrático Medio ($RMSE$) y Error Absoluto Medio ($MAE$).
+\end{itemize}
+
+
+\end{document}
